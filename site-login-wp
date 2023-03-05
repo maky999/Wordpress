@@ -1,0 +1,89 @@
+dang-nhap.php
+
+
+<?php
+/*
+ Template Name: Đăng Nhập
+ */
+?>
+<link rel="stylesheet" href="../assets/css/global.css">
+<?php get_header();?>
+<div class="container-v2">
+<?php while (have_posts()):the_post();?>
+        <div class="content_main login">
+            <div class="theme_gallery about_us">
+                <div class="theme_gallery_title">
+                    <h1><?php the_title();?></h1>
+                </div>
+                <div class="category_description"><?php the_content(); ?> </div>
+                <div class="login-form"> 
+                  
+                    <?php  
+                    $login  = (isset($_GET['login']) ) ? $_GET['login'] : 0;
+                    if ( $login === "failed" ) {  
+                        echo '<p class="login-msg"><strong>ERROR:</strong> Tên đăng nhập và / hoặc mật khẩu không đúng!</p>';  
+                    } elseif ( $login === "empty" ) {  
+                        echo '<p class="login-msg"><strong>ERROR:</strong> Tên người dùng và/hoặc Mật khẩu trống!</p>';  
+                    } elseif ( $login === "false" ) {
+                        echo '<p class="login-msg"><strong>ERROR:</strong> Bạn đã đăng xuất!</p>';  
+                    }
+                    $args = array(  
+                        'redirect' => home_url(),   
+                        'id_username' => 'user',  
+                        'id_password' => 'pass',  
+                       )   
+                    ;?>  
+                    <?php wp_login_form( $args ); ?>  
+                 </div>
+            </div>
+        </div>
+</div>
+        <!-- End gallery -->
+<?php endwhile;?>
+<?php get_footer();?> 
+
+
+
+
+
+
+
+
+
+
+
+//functions.php
+
+function redirect_login_page() { 
+ $login_page = home_url( '/dang-nhap/' ); 
+ $page_viewed = basename($_SERVER['REQUEST_URI']); 
+  
+ if( $page_viewed == "wp-login.php" && $_SERVER['REQUEST_METHOD'] == 'GET') { 
+ wp_redirect($login_page); 
+ exit; 
+ } 
+} 
+add_action('init','redirect_login_page'); 
+//Login Failed
+function login_failed() { 
+ $login_page = home_url( '/dang-nhap/' ); 
+ wp_redirect( $login_page . '?login=failed' ); 
+ exit; 
+} 
+add_action( 'wp_login_failed', 'login_failed' ); 
+//Login failed pass or user
+function verify_username_password( $user, $username, $password ) { 
+ $login_page = home_url( '/dang-nhap/' ); 
+ if( $username == "" || $password == "" ) { 
+ wp_redirect( $login_page . "?login=empty" ); 
+ exit; 
+ } 
+} 
+add_filter( 'authenticate', 'verify_username_password', 1, 3); 
+//Log Out
+function logout_page() { 
+ $login_page = home_url( '/dang-nhap/' ); 
+ wp_redirect( $login_page . "?login=false" ); 
+ exit; 
+} 
+add_action('wp_logout','logout_page');
